@@ -44,11 +44,13 @@ CREATE TABLE room (
 CREATE TABLE reservation (
     reservation_id INT PRIMARY KEY AUTO_INCREMENT,
     customer_id INT,
+    hotel_id INT,
     checkin_date DATE NOT NULL,
     checkout_date DATE NOT NULL,
     guest_count INT NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (hotel_id) REFERENCES hotel(hotel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- ReservationDetails Table
 CREATE TABLE reservationDetails (
@@ -180,17 +182,17 @@ INSERT INTO room (room_id, room_number, room_type_id, hotel_id, price) VALUES
 
 
 
-INSERT INTO reservation (reservation_id, customer_id, checkin_date, checkout_date, total_price, guest_count) VALUES
-(3001, 1001, '2023-11-10', '2023-11-15', 500.00, 3),
-(3002, 1002, '2023-11-12', '2023-11-14', 300.00, 2),
-(3003, 1003, '2023-11-15', '2023-11-20', 750.00, 1),
-(3004, 1004, '2023-11-18', '2023-11-22', 600.00, 2),
-(3005, 1005, '2023-11-20', '2023-11-25', 900.00, 3),
-(3006, 1006, '2023-11-21', '2023-11-26', 450.00, 1),
-(3007, 1007, '2023-11-23', '2023-11-28', 550.00, 1),
-(3008, 1008, '2023-11-25', '2023-11-30', 650.00, 1),
-(3009, 1009, '2023-11-28', '2023-12-03', 700.00, 1),
-(3010, 1010, '2023-12-01', '2023-12-05', 800.00, 3);
+INSERT INTO reservation (reservation_id, customer_id, hotel_id, checkin_date, checkout_date, total_price, guest_count) VALUES
+(3001, 1001, 101, '2023-11-10', '2023-11-15', 500.00, 3),
+(3002, 1002, 102,'2023-11-12', '2023-11-14', 300.00, 2),
+(3003, 1003,103, '2023-11-15', '2023-11-20', 750.00, 1),
+(3004, 1004, 103,'2023-11-18', '2023-11-22', 600.00, 2),
+(3005, 1005,101, '2023-11-20', '2023-11-25', 900.00, 3),
+(3006, 1006, 106,'2023-11-21', '2023-11-26', 450.00, 1),
+(3007, 1007,104 ,'2023-11-23', '2023-11-28', 550.00, 1),
+(3008, 1008,105, '2023-11-25', '2023-11-30', 650.00, 1),
+(3009, 1009, 102,'2023-11-28', '2023-12-03', 700.00, 1),
+(3010, 1010,101, '2023-12-01', '2023-12-05', 800.00, 3);
 
 
 INSERT INTO reservationDetails (reservation_id, room_id, guest_count) VALUES
