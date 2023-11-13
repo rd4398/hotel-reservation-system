@@ -76,3 +76,71 @@ DELIMITER ;
 
 CALL AddCustomer('Jo', 'Doe', 'jon.e@example.com', '123-456-7890', '1990-01-01');
 
+-- Get Available room for given room Id
+
+DELIMITER //
+
+CREATE PROCEDURE GetAvailableRoom(IN room_type_id INT, IN checkin_date DATE, IN checkout_date DATE, OUT next_room_id INT)
+BEGIN
+    -- Check if there is an entry in roomAvailability for the given room type and date range
+    SELECT MAX(room_id) INTO next_room_id
+    FROM roomAvailability ra
+    WHERE ra.room_id = (
+        SELECT MAX(r.room_id)
+        FROM room r
+        WHERE r.room_type_id = room_type_id
+    )
+    AND ra.date BETWEEN checkin_date AND checkout_date
+    AND ra.is_available = 1;
+
+    -- If no available room found, set next_room_id to NULL
+    IF next_room_id IS NULL THEN
+        SET next_room_id = NULL;
+    END IF;
+END //
+
+DELIMITER ;
+
+
+-- Reserve Room assuming each extra guest costs same
+
+DELIMITER //
+
+CREATE PROCEDURE ReserveRoom(
+    IN room_id INT,
+    IN customer_id INT,
+    IN checkin_date DATE,
+    IN checkout_date DATE,
+    IN guest_count INT,
+    OUT reservation_id INT
+)
+BEGIN
+    -- Check if the room is available for the given date range
+    DECLARE is_room_available INT;
+
+    SELECT COUNT(*) INTO is_room_available
+    FROM roomAvailability ra
+    WHERE ra.room_id = room_id
+        AND ra.date BETWEEN checkin_date AND checkout_date
+        AND ra.is_available = 1;
+
+    -- If the room is available, proceed with the reservation
+    IF is_room_available > 0 THEN
+        -- Insert reservation details
+        INSERT INTO reservation (customer_id, checkin_date, checkout_date, guest_count, total_price)
+        VALUES (customer_id, checkin_date, checkout_date, guest_count, CALCULATE_TOTAL_PRICE(checkin_date,checkout_date,room_id, guest_count));
+
+        -- Get the last inserted reservation_id
+        SET reservation_id = LAST_INSERT_ID();
+
+        -- Insert reservation details for the room
+        INSERT INTO reservationDetails (reservation_id, room_id, guest_count)
+        VALUES (reservation_id, room_id, guest_count);
+        
+    ELSE
+        -- Room is not available, set reservation_id to NULL
+        SET reservation_id = NULL;
+    END IF;
+END //
+
+DELIMITER ;

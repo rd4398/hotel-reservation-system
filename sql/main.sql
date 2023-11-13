@@ -38,8 +38,6 @@ CREATE TABLE room (
     FOREIGN KEY (room_type_id) REFERENCES roomType(room_type_id)
 );
 
-
-
 -- Reservation Table
 CREATE TABLE reservation (
     reservation_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -177,35 +175,6 @@ INSERT INTO room (room_id, room_number, room_type_id, hotel_id, price) VALUES
 (309, 205, 2, 102, 140.00);
 
 
-
-
-
-INSERT INTO reservation (reservation_id, customer_id, checkin_date, checkout_date, total_price, guest_count) VALUES
-(3001, 1001, '2023-11-10', '2023-11-15', 500.00, 3),
-(3002, 1002, '2023-11-12', '2023-11-14', 300.00, 2),
-(3003, 1003, '2023-11-15', '2023-11-20', 750.00, 1),
-(3004, 1004, '2023-11-18', '2023-11-22', 600.00, 2),
-(3005, 1005, '2023-11-20', '2023-11-25', 900.00, 3),
-(3006, 1006, '2023-11-21', '2023-11-26', 450.00, 1),
-(3007, 1007, '2023-11-23', '2023-11-28', 550.00, 1),
-(3008, 1008, '2023-11-25', '2023-11-30', 650.00, 1),
-(3009, 1009, '2023-11-28', '2023-12-03', 700.00, 1),
-(3010, 1010, '2023-12-01', '2023-12-05', 800.00, 3);
-
-
-INSERT INTO reservationDetails (reservation_id, room_id, guest_count) VALUES
-(3001, 300, 3),
-(3002, 301, 2),
-(3003, 302, 1),
-(3004, 303, 2),
-(3005, 304, 3),
-(3006, 305, 1),
-(3007, 306, 1),
-(3008, 307, 1),
-(3009, 308, 1),
-(3010, 309, 3);
-
-
 INSERT INTO activity (activity_id, name, description, price, type) VALUES
 (4001, 'Spa Day', 'A full day of pampering with massages and treatments.', 120.00, 'Wellness'),
 (4002, 'City Tour', 'Guided tour around the city’s historic landmarks.', 60.00, 'Excursion'),
@@ -217,19 +186,6 @@ INSERT INTO activity (activity_id, name, description, price, type) VALUES
 (4008, 'Horseback Riding', 'Enjoy a ride through scenic trails on horseback.', 75.00, 'Sport'),
 (4009, 'Live Concert', 'Evening entertainment featuring live music.', 40.00, 'Entertainment'),
 (4010, 'Dinner Cruise', 'A romantic evening cruise with dinner on the deck.', 100.00, 'Dining');
-
-
-INSERT INTO activityBooking (activity_id, customer_id, date) VALUES
-(4001, 1001, '2023-11-15'),
-(4002, 1002, '2023-11-16'),
-(4003, 1003, '2023-11-17'),
-(4004, 1004, '2023-11-18'),
-(4005, 1005, '2023-11-19'),
-(4006, 1001, '2023-11-20'),
-(4007, 1002, '2023-11-21'),
-(4008, 1003, '2023-11-22'),
-(4009, 1004, '2023-11-23'),
-(4010, 1005, '2023-11-24');
 
 
 INSERT INTO employee (employee_id, name, role, DOB, salary, hotel_id) VALUES
