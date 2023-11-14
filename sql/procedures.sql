@@ -144,3 +144,14 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Procedure to fetch customer details using customer_id
+
+DELIMITER //
+
+CREATE PROCEDURE GetCustomerDetails(IN customerID INT)
+BEGIN
+    SELECT * FROM customer WHERE customer_id = customerID;
+END //
+
+DELIMITER ;
