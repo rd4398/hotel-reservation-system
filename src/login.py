@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import messagebox
 import config
 import connection
+import customer_dashboard
 
 '''
 This method spins up the UI and starts the application. It asks the customer to register (create account) for the
@@ -173,7 +174,7 @@ def login():
         else:
                 messagebox.showinfo(title='Warning', message='Customer Login Failed')
         
-        # customer_dashboard.customer_dashboard()
+        customer_dashboard.customer_dashboard()
 
 def get_uname():
         return uname_data

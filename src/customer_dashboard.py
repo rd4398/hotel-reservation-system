@@ -32,6 +32,8 @@ def customer_dashboard():
 
     # Customer Menu
     customer_account_menu = tk.Menu(menubar,tearoff=0)
+    customer_account_menu.add_command(label='View Account', command=get_account_screen)
+    customer_account_menu.add_separator()
     customer_account_menu.add_command(label='Update Account', command=update_account_screen)
     customer_account_menu.add_separator()
     customer_account_menu.add_command(label='Delete Account',command=delete_account_prompt)
@@ -39,6 +41,8 @@ def customer_dashboard():
 
     # Reservation Menu
     reservation_menu = tk.Menu(menubar,tearoff=0)
+    reservation_menu.add_command(label='Get Reservation', command=get_reservation_screen)
+    reservation_menu.add_separator()
     reservation_menu.add_command(label='Update Reservation', command=update_reservation_screen)
     reservation_menu.add_separator()
     reservation_menu.add_command(label='Delete Reseravtion',command=delete_reservation_prompt)
@@ -269,6 +273,141 @@ def reserve_hotel():
     num_guests.set('')
 
 
+def get_reservation_screen():
+    global lookup_reservation_screen
+    lookup_reservation_screen = tk.Toplevel(customer_dashboard_screen)
+    lookup_reservation_screen.geometry('400x200')
+    lookup_reservation_screen.title('Get Reservation')
+    global resv_id 
+    resv_id = tk.IntVar()
+
+    lookup_c_id_label = tk.Label(lookup_reservation_screen, text='Candidate Id')
+    lookup_c_id_label.place(x=40, y=30)
+    lookup_c_id_entry = tk.Entry(lookup_reservation_screen, textvariable=resv_id)
+    lookup_c_id_entry.place(x = 140, y=30)
+
+    lookup_candidate_button = tk.Button(lookup_reservation_screen, text='Get', width=10, height=1,bg='grey', command=get_reservation)
+    lookup_candidate_button.place(x=150,y=150)
+
+    w =lookup_reservation_screen.winfo_reqwidth()
+    h =lookup_reservation_screen.winfo_reqheight()
+    ws=lookup_reservation_screen.winfo_screenwidth()
+    hs =lookup_reservation_screen.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    lookup_reservation_screen.geometry('+%d+%d' % (x, y))
+    lookup_reservation_screen.mainloop()
+
+def get_reservation_helper():
+    resv_id_data = resv_id.get()
+    global f_name
+    global l_name
+    global h_name
+    global hotel_address
+    global rm_type
+    global rm_num
+    global chkindate
+    global chkoutdate
+    flag = ''
+
+    f_name = tk.StringVar()
+    l_name = tk.StringVar()
+    h_name = tk.StringVar()
+    hotel_address = tk.StringVar()
+    rm_type = tk.StringVar()
+    rm_num = tk.IntVar()
+    chkindate = tk.StringVar()
+    chkoutdate = tk.StringVar()
+
+    try:
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+        cur.callproc("GetCustomerReservationDetails", (resv_id_data,))
+        rows = cur.fetchall()
+        if not rows:
+            messagebox.showinfo(title='Conflict', message='Reservation Not found')
+            flag = 'Fail'
+        else:
+            flag = 'Pass'
+            f_name.set(rows[0]['first_name'])
+            l_name.set(rows[0]['last_name'])
+            h_name.set(rows[0]['hotel_name'])
+            hotel_address.set(rows[0]['hotel_address'])
+            rm_type.set(rows[0]['room_type'])
+            rm_num.set(rows[0]['room_number'])
+            chkindate.set(rows[0]['checkin_date'])
+            chkoutdate.set(rows[0]['checkout_date'])
+
+    except pymysql.err.OperationalError as e:
+        print('Error is: '+ str(e))
+    return flag
+
+def get_reservation():
+    lookup_reservation_screen.destroy()
+    result = get_reservation_helper()
+
+    if result == 'Pass':
+
+        global lookup_result_screen
+        lookup_result_screen = tk.Toplevel(customer_dashboard_screen)
+        lookup_result_screen.geometry('800x500')
+        lookup_result_screen.title('Lookup Reservation')
+
+
+        f_name_label = tk.Label(lookup_result_screen, text='First Name')
+        f_name_label.place(x=70, y=100)
+        f_name_entry = tk.Entry(lookup_result_screen, textvariable=f_name)
+        f_name_entry.place(x = 180, y=100)
+
+        l_name_label = tk.Label(lookup_result_screen, text='Last Name')
+        l_name_label.place(x=70, y=175)
+        l_name_entry = tk.Entry(lookup_result_screen, textvariable=l_name)
+        l_name_entry.place(x = 180, y=175)
+
+        h_name_label = tk.Label(lookup_result_screen, text='Hotel Name')
+        h_name_label.place(x=70, y=250)
+        h_name_entry = tk.Entry(lookup_result_screen, textvariable=h_name)
+        h_name_entry.place(x = 180, y=250)
+
+        hotel_address_label = tk.Label(lookup_result_screen, text='Hotel Address')
+        hotel_address_label.place(x=70, y=325)
+        hotel_address_entry = tk.Entry(lookup_result_screen, textvariable=hotel_address)
+        hotel_address_entry.place(x = 180, y=325)
+
+        rm_type_label = tk.Label(lookup_result_screen, text='Room Type')
+        rm_type_label.place(x=360, y=100)
+        rm_type_entry = tk.Entry(lookup_result_screen, textvariable=rm_type)
+        rm_type_entry.place(x = 480, y=100)
+
+        rm_num_label = tk.Label(lookup_result_screen, text='Room Number')
+        rm_num_label.place(x=360, y=175)
+        rm_num_entry = tk.Entry(lookup_result_screen, textvariable=rm_num)
+        rm_num_entry.place(x = 480, y=175)
+
+        chkindate_label = tk.Label(lookup_result_screen, text='Checkin Date')
+        chkindate_label.place(x=360, y=250)
+        chkindate_entry = tk.Entry(lookup_result_screen, textvariable=chkindate)
+        chkindate_entry.place(x = 480, y=250)
+
+        chkoutdate_label = tk.Label(lookup_result_screen, text='Checkout Date')
+        chkoutdate_label.place(x=360, y=325)
+        chkoutdate_entry = tk.Entry(lookup_result_screen, textvariable=chkoutdate)
+        chkoutdate_entry.place(x = 480, y=325)
+
+
+        w =lookup_result_screen.winfo_reqwidth()
+        h =lookup_result_screen.winfo_reqheight()
+        ws=lookup_result_screen.winfo_screenwidth()
+        hs =lookup_result_screen.winfo_screenheight()
+        x = (ws/2) - (w/2) - 100
+        y = (hs/2) - (h/2) - 100 
+        lookup_result_screen.geometry('+%d+%d' % (x, y))
+        lookup_result_screen.mainloop()
+
+def get_account_screen():
+    pass
 
 def update_account_screen():
     # TODO 
@@ -283,8 +422,48 @@ def update_reservation_screen():
     pass
 
 def delete_reservation_prompt():
-    # TODO 
-    pass
+    global delete_reservation_screen
+    delete_reservation_screen = tk.Toplevel(customer_dashboard_screen)
+    delete_reservation_screen.geometry('400x200')
+    delete_reservation_screen.title('Delete Reservation')
+    global del_resv_id
+    del_resv_id = tk.IntVar()
+
+    del_resv_id_label = tk.Label(delete_reservation_screen, text='Reservation Id')
+    del_resv_id_label.place(x=40, y=30)
+    del_resv_id_entry = tk.Entry(delete_reservation_screen, textvariable=del_resv_id)
+    del_resv_id_entry.place(x = 140, y=30)
+
+    delete_reservation_button = tk.Button(delete_reservation_screen, text='Delete', width=10, height=1,bg='grey', command=delete_reservation)
+    delete_reservation_button.place(x=150,y=150)
+
+    w =delete_reservation_screen.winfo_reqwidth()
+    h =delete_reservation_screen.winfo_reqheight()
+    ws=delete_reservation_screen.winfo_screenwidth()
+    hs =delete_reservation_screen.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    delete_reservation_screen.geometry('+%d+%d' % (x, y))
+    delete_reservation_screen.mainloop()
+
+def delete_reservation():
+    del_resv_id_data = del_resv_id.get()
+    try:
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+        delete_query = 'delete from reservation where reservation_id=%s'
+        cur.execute(delete_query,del_resv_id_data)
+        con.commit()
+        cur.close()
+        con.close()
+        messagebox.showinfo(title='Confirmation', message='Reservation Deleted Successfully')
+    except pymysql.err.OperationalError as e:
+        print('Error is: ')
+    
+    del_resv_id.set(0)
+    delete_reservation_screen.destroy()
 
 def add_review_screen_launch():
     # TODO 
