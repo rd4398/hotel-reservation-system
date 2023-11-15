@@ -406,16 +406,163 @@ def get_reservation():
         lookup_result_screen.geometry('+%d+%d' % (x, y))
         lookup_result_screen.mainloop()
 
+
+
 def get_account_screen():
-    pass
+    global lookup_customer_screen
+    lookup_customer_screen = tk.Toplevel(customer_dashboard_screen)
+    lookup_customer_screen.geometry('400x200')
+    lookup_customer_screen.title('Get Customer Details')
+    global cust_id 
+    cust_id = tk.IntVar()
+
+    lookup_c_id_label = tk.Label(lookup_customer_screen, text='Customer Id')
+    lookup_c_id_label.place(x=40, y=30)
+    lookup_c_id_entry = tk.Entry(lookup_customer_screen, textvariable=cust_id)
+    lookup_c_id_entry.place(x = 140, y=30)
+
+    lookucustomer_button = tk.Button(lookup_customer_screen, text='Get', width=10, height=1,bg='grey', command=get_customer)
+    lookucustomer_button.place(x=150,y=150)
+
+    w =lookup_customer_screen.winfo_reqwidth()
+    h =lookup_customer_screen.winfo_reqheight()
+    ws=lookup_customer_screen.winfo_screenwidth()
+    hs =lookup_customer_screen.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    lookup_customer_screen.geometry('+%d+%d' % (x, y))
+    lookup_customer_screen.mainloop()
+
+def get_customer_helper():
+    cust_id_data = cust_id.get()
+    global f_name
+    global l_name
+    global eml
+    global phn
+    global b_date
+    flag = ''
+
+    f_name = tk.StringVar()
+    l_name = tk.StringVar()
+    eml = tk.StringVar()
+    phn = tk.StringVar()
+    b_date = tk.StringVar()
+    
+    try:
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+        cur.callproc("GetCustomerDetails", (cust_id_data,))
+        rows = cur.fetchall()
+        if not rows:
+            messagebox.showinfo(title='Conflict', message='Customer Not found')
+            flag = 'Fail'
+        else:
+            flag = 'Pass'
+            f_name.set(rows[0]['first_name'])
+            l_name.set(rows[0]['last_name'])
+            eml.set(rows[0]['email'])
+            phn.set(rows[0]['phone'])
+            b_date.set(rows[0]['DOB'])
+
+    except pymysql.err.OperationalError as e:
+        print('Error is: '+ str(e))
+    return flag
+
+def get_customer():
+    lookup_customer_screen.destroy()
+    result = get_customer_helper()
+
+    if result == 'Pass':
+
+        global lookup_result_screen
+        lookup_result_screen = tk.Toplevel(customer_dashboard_screen)
+        lookup_result_screen.geometry('800x500')
+        lookup_result_screen.title('Lookup Customer')
+
+
+        f_name_label = tk.Label(lookup_result_screen, text='First Name')
+        f_name_label.place(x=70, y=100)
+        f_name_entry = tk.Entry(lookup_result_screen, textvariable=f_name)
+        f_name_entry.place(x = 180, y=100)
+
+        l_name_label = tk.Label(lookup_result_screen, text='Last Name')
+        l_name_label.place(x=70, y=175)
+        l_name_entry = tk.Entry(lookup_result_screen, textvariable=l_name)
+        l_name_entry.place(x = 180, y=175)
+
+        eml_label = tk.Label(lookup_result_screen, text='Email')
+        eml_label.place(x=70, y=250)
+        eml_entry = tk.Entry(lookup_result_screen, textvariable=eml)
+        eml_entry.place(x = 180, y=250)
+
+        phn_label = tk.Label(lookup_result_screen, text='Phone Number')
+        phn_label.place(x=70, y=325)
+        phn_entry = tk.Entry(lookup_result_screen, textvariable=phn)
+        phn_entry.place(x = 180, y=325)
+
+        b_date_label = tk.Label(lookup_result_screen, text='DOB')
+        b_date_label.place(x=360, y=100)
+        b_date_entry = tk.Entry(lookup_result_screen, textvariable=b_date)
+        b_date_entry.place(x = 480, y=100)
+
+        w =lookup_result_screen.winfo_reqwidth()
+        h =lookup_result_screen.winfo_reqheight()
+        ws=lookup_result_screen.winfo_screenwidth()
+        hs =lookup_result_screen.winfo_screenheight()
+        x = (ws/2) - (w/2) - 100
+        y = (hs/2) - (h/2) - 100 
+        lookup_result_screen.geometry('+%d+%d' % (x, y))
+        lookup_result_screen.mainloop()
 
 def update_account_screen():
     # TODO 
     pass
 
 def delete_account_prompt():
-    # TODO 
-    pass
+    global delete_account_screen
+    delete_account_screen = tk.Toplevel(customer_dashboard_screen)
+    delete_account_screen.geometry('400x200')
+    delete_account_screen.title('Delete Customer Details')
+    global del_cust_id
+    del_cust_id = tk.IntVar()
+
+    del_cust_id_label = tk.Label(delete_account_screen, text='Customer Id')
+    del_cust_id_label.place(x=40, y=30)
+    del_cust_id_entry = tk.Entry(delete_account_screen, textvariable=del_cust_id)
+    del_cust_id_entry.place(x = 140, y=30)
+
+    delete_customer_button = tk.Button(delete_account_screen, text='Delete', width=10, height=1,bg='grey', command=delete_customer)
+    delete_customer_button.place(x=150,y=150)
+
+    w =delete_account_screen.winfo_reqwidth()
+    h =delete_account_screen.winfo_reqheight()
+    ws=delete_account_screen.winfo_screenwidth()
+    hs =delete_account_screen.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    delete_account_screen.geometry('+%d+%d' % (x, y))
+    delete_account_screen.mainloop()
+
+def delete_customer():
+    del_cust_id_data = del_cust_id.get()
+    try:
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+        delete_query = 'delete from customer where customer_id=%s'
+        cur.execute(delete_query,del_cust_id_data)
+        con.commit()
+        cur.close()
+        con.close()
+        messagebox.showinfo(title='Confirmation', message='Customer Deleted Successfully')
+    except pymysql.err.OperationalError as e:
+        print('Error is: '+str(e))
+    
+    del_cust_id.set(0)
+    delete_account_screen.destroy()
 
 def update_reservation_screen():
     # TODO 
