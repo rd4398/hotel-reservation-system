@@ -155,3 +155,61 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- procedure to update customer details
+DELIMITER //
+
+CREATE PROCEDURE updateCustomerDetails(
+    IN customerId INT,
+    IN newPhoneNumber VARCHAR(15),
+    IN newEmail VARCHAR(255)
+)
+BEGIN
+    UPDATE customer
+    SET phone = newPhoneNumber, email = newEmail
+    WHERE customer_id = customerId;
+END //
+
+DELIMITER ;
+
+CALL updateCustomerDetails(1001, '555-0301', 'marcopolo@gmail.com');
+
+
+
+
+-- Procedure to update reservation details 
+DELIMITER //
+
+CREATE PROCEDURE updateReservationDetails(
+    IN resId INT,
+    IN newCheckInDate DATE,
+    IN newCheckOutDate DATE,
+    IN newGuestNumber INT,
+    IN newActivity INT,
+    IN newRoomType INT
+)
+BEGIN
+    DECLARE customerId INT;
+
+    -- Find the customer ID associated with the reservation
+    SELECT customer_id INTO customerId FROM reservation WHERE reservation_id = resId;
+
+    -- Update the reservation table
+    UPDATE reservation
+    SET checkin_date = newCheckInDate, checkout_date = newCheckOutDate, guest_count = newGuestNumber
+    WHERE reservation_id = resId;
+
+    -- Update the reservationDetails table
+    UPDATE reservationDetails
+    SET room_id = (SELECT room_id FROM room WHERE room_type_id = newRoomType LIMIT 1)
+    WHERE reservation_id = resId;
+
+    -- Update the activityBooking table based on the customer ID and reservation dates
+    UPDATE activityBooking
+    SET activity_id = newActivity
+    WHERE customer_id = customerId ;
+END //
+
+DELIMITER ;
+CALL updateReservationDetails(3003, '2024-01-01', '2024-01-05', 4, 4003, 2);
+
