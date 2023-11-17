@@ -517,8 +517,65 @@ def get_customer():
         lookup_result_screen.mainloop()
 
 def update_account_screen():
-    # TODO 
-    pass
+    global update_account_prompt
+    update_account_prompt = tk.Toplevel(customer_dashboard_screen)
+    update_account_prompt.geometry('400x300')
+    update_account_prompt.title('Update Customer Details')
+    global upd_cust_id
+    global new_phn
+    global new_email
+    upd_cust_id = tk.IntVar()
+    new_phn = tk.StringVar()
+    new_email = tk.StringVar()
+
+    upd_cust_id_label = tk.Label(update_account_prompt, text='Customer Id')
+    upd_cust_id_label.place(x=40, y=30)
+    upd_cust_id_entry = tk.Entry(update_account_prompt, textvariable=upd_cust_id)
+    upd_cust_id_entry.place(x = 140, y=30)
+
+    new_phn_label = tk.Label(update_account_prompt, text='New Phone')
+    new_phn_label.place(x=40, y=105)
+    new_phn_entry = tk.Entry(update_account_prompt, textvariable=new_phn)
+    new_phn_entry.place(x = 140, y=105)
+
+    new_email_label = tk.Label(update_account_prompt, text='New Email')
+    new_email_label.place(x=40, y=180)
+    new_email_entry = tk.Entry(update_account_prompt, textvariable=new_email)
+    new_email_entry.place(x = 140, y=180)
+
+    update_customer_button = tk.Button(update_account_prompt, text='Update', width=10, height=1,bg='grey', command=update_customer)
+    update_customer_button.place(x=150,y=250)
+
+    w =update_account_prompt.winfo_reqwidth()
+    h =update_account_prompt.winfo_reqheight()
+    ws=update_account_prompt.winfo_screenwidth()
+    hs =update_account_prompt.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    update_account_prompt.geometry('+%d+%d' % (x, y))
+    update_account_prompt.mainloop()
+
+def update_customer():
+    upd_cust_id_data = upd_cust_id.get()
+    new_phn_data = new_phn.get()
+    new_email_data = new_email.get()
+    try:
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+        cur.callproc("updateCustomerDetails", (upd_cust_id_data, new_phn_data, new_email_data,))
+        con.commit()
+        cur.close()
+        con.close()
+        messagebox.showinfo(title='Confirmation', message='Customer Updated Successfully')
+    except pymysql.err.OperationalError as e:
+        print('Error is: '+str(e))
+    
+    upd_cust_id.set(0)
+    new_phn.set(0)
+    new_email.set(0)
+    update_account_prompt.destroy()
 
 def delete_account_prompt():
     global delete_account_screen
@@ -565,8 +622,121 @@ def delete_customer():
     delete_account_screen.destroy()
 
 def update_reservation_screen():
-    # TODO 
-    pass
+    global update_reservation_prompt
+    update_reservation_prompt = tk.Toplevel(customer_dashboard_screen)
+    update_reservation_prompt.geometry('600x600')
+    update_reservation_prompt.title('Update Reservation Details')
+    global upd_resv_id
+    global new_checkin
+    global new_checkout
+    global new_guest_cnt
+    global new_activity
+    global new_room_type
+    upd_resv_id = tk.IntVar()
+    new_checkin = tk.StringVar()
+    new_checkout = tk.StringVar()
+    new_guest_cnt = tk.IntVar()
+    new_activity = tk.StringVar()
+    new_room_type = tk.StringVar()
+    room_types = []
+    activity_list = []
+
+    mysql_creds = config.get_mysql_creds()
+    conObj = connection.Connect(mysql_creds)
+    con = conObj.make_connection()
+    cur = con.cursor()
+
+    room_query = 'select type_name from roomType'
+    cur.execute(room_query)
+    room_rows = cur.fetchall()
+
+    activity_query = 'select name from activity'
+    cur.execute(activity_query)
+    activity_rows = cur.fetchall()
+
+    cur.close()
+    con.close()
+
+
+    for r in room_rows:
+        room_types.append(r['type_name'])
+
+    for r in activity_rows:
+        activity_list.append(r['name'])
+
+    upd_resv_id_label = tk.Label(update_reservation_prompt, text='Reservation Id')
+    upd_resv_id_label.place(x=40, y=30)
+    upd_resv_id_entry = tk.Entry(update_reservation_prompt, textvariable=upd_resv_id)
+    upd_resv_id_entry.place(x = 180, y=30)
+
+    new_checkin_label = tk.Label(update_reservation_prompt, text='New Chekindate')
+    new_checkin_label.place(x=40, y=105)
+    new_checkin_entry = tk.Entry(update_reservation_prompt, textvariable=new_checkin)
+    new_checkin_entry.place(x = 180, y=105)
+
+    new_checkout_label = tk.Label(update_reservation_prompt, text='New Checkoutdate')
+    new_checkout_label.place(x=40, y=180)
+    new_checkout_entry = tk.Entry(update_reservation_prompt, textvariable=new_checkout)
+    new_checkout_entry.place(x = 180, y=180)
+
+    new_guest_cnt_label = tk.Label(update_reservation_prompt, text='New Guest Count')
+    new_guest_cnt_label.place(x=40, y=255)
+    new_guest_cnt_entry = tk.Entry(update_reservation_prompt, textvariable=new_guest_cnt)
+    new_guest_cnt_entry.place(x = 180, y=255)
+
+    new_room_type_label = tk.Label(update_reservation_prompt, text='New Room Type')
+    new_room_type_label.place(x=40, y=330)
+    new_room_type_entry = tk.OptionMenu(update_reservation_prompt, new_room_type, *room_types)
+    new_room_type.set(room_types[0])
+    new_room_type_entry.place(x = 180, y=330)
+
+    new_activity_label = tk.Label(update_reservation_prompt, text='New Activity')
+    new_activity_label.place(x=40, y=405)
+    new_activity_entry = tk.OptionMenu(update_reservation_prompt, new_activity, *activity_list)
+    new_activity.set(activity_list[0])
+    new_activity_entry.place(x = 180, y=405)
+
+    update_reservation_button = tk.Button(update_reservation_prompt, text='Update', width=10, height=1,bg='grey', command=update_reservation)
+    update_reservation_button.place(x=250,y=480)
+
+    w =update_reservation_prompt.winfo_reqwidth()
+    h =update_reservation_prompt.winfo_reqheight()
+    ws=update_reservation_prompt.winfo_screenwidth()
+    hs =update_reservation_prompt.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    update_reservation_prompt.geometry('+%d+%d' % (x, y))
+    update_reservation_prompt.mainloop()
+
+def update_reservation():
+    upd_resv_id_data = upd_resv_id.get()
+    new_checkin_data = new_checkin.get()
+    new_checkout_data = new_checkout.get()
+    new_guest_cnt_data = new_guest_cnt.get()
+    new_room_type_data = new_room_type.get()
+    new_activity_data = new_activity.get()
+    try:
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+        cur.callproc("updateReservationDetails", (upd_resv_id_data, new_checkin_data, new_checkout_data, new_guest_cnt_data, new_activity_data, new_room_type_data))
+        con.commit()
+        cur.close()
+        con.close()
+        messagebox.showinfo(title='Confirmation', message='Reservation Updated Successfully')
+    except pymysql.err.OperationalError as e:
+        print('Error is: '+str(e))
+    
+    upd_resv_id.set(0)
+    new_checkin.set(0)
+    new_checkout.set(0)
+    new_guest_cnt.set(0)
+    new_room_type.set('Standard')
+    new_activity.set('Spa Day')
+    update_reservation_prompt.destroy()
+
+
 
 def delete_reservation_prompt():
     global delete_reservation_screen
