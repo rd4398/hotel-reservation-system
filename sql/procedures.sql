@@ -185,14 +185,22 @@ CREATE PROCEDURE updateReservationDetails(
     IN newCheckInDate DATE,
     IN newCheckOutDate DATE,
     IN newGuestNumber INT,
-    IN newActivity INT,
-    IN newRoomType INT
+    IN newActivityName VARCHAR(255),
+    IN newRoomTypeName VARCHAR(255)
 )
 BEGIN
     DECLARE customerId INT;
+    DECLARE newActivityId INT;
+    DECLARE newRoomTypeId INT;
 
     -- Find the customer ID associated with the reservation
     SELECT customer_id INTO customerId FROM reservation WHERE reservation_id = resId;
+
+    -- Get the activity_id based on the activity name
+    SELECT activity_id INTO newActivityId FROM activity WHERE name = newActivityName;
+
+    -- Get the room_type_id based on the room type name
+    SELECT room_type_id INTO newRoomTypeId FROM roomType WHERE type_name = newRoomTypeName;
 
     -- Update the reservation table
     UPDATE reservation
@@ -201,15 +209,14 @@ BEGIN
 
     -- Update the reservationDetails table
     UPDATE reservationDetails
-    SET room_id = (SELECT room_id FROM room WHERE room_type_id = newRoomType LIMIT 1)
+    SET room_id = (SELECT room_id FROM room WHERE room_type_id = newRoomTypeId LIMIT 1)
     WHERE reservation_id = resId;
 
     -- Update the activityBooking table based on the customer ID and reservation dates
     UPDATE activityBooking
-    SET activity_id = newActivity
-    WHERE customer_id = customerId ;
+    SET activity_id = newActivityId
+    WHERE customer_id = customerId;
 END //
 
 DELIMITER ;
-CALL updateReservationDetails(3003, '2024-01-01', '2024-01-05', 4, 4003, 2);
-
+CALL updateReservationDetails(3001, '2024-01-01', '2024-01-05', 4, 'Wine Tasting', 'Deluxe');
