@@ -783,8 +783,107 @@ def delete_reservation():
     delete_reservation_screen.destroy()
 
 def add_review_screen_launch():
-    # TODO 
-    pass
+    global add_review_prompt
+    add_review_prompt = tk.Toplevel(customer_dashboard_screen)
+    add_review_prompt.geometry('600x600')
+    add_review_prompt.title('Submit Review')
+    global c_id
+    global htl_name
+    global review_entry
+    global source
+    global rating
+    c_id = tk.IntVar()
+    htl_name = tk.StringVar()
+    source = tk.StringVar()
+    rating = tk.IntVar()
+    hotels = []
+    ratings = [1, 2, 3, 4, 5]
+
+    mysql_creds = config.get_mysql_creds()
+    conObj = connection.Connect(mysql_creds)
+    con = conObj.make_connection()
+    cur = con.cursor()
+    hotel_query = 'select name from hotel'
+    cur.execute(hotel_query)
+    hotel_rows = cur.fetchall()
+
+    for r in hotel_rows:
+        hotels.append(r['name'])
+
+    c_id_label = tk.Label(add_review_prompt, text='Customer Id')
+    c_id_label.place(x=40, y=30)
+    c_id_entry = tk.Entry(add_review_prompt, textvariable=c_id)
+    c_id_entry.place(x = 180, y=30)
+
+    htl_name_label = tk.Label(add_review_prompt, text='Hotel Name')
+    htl_name_label.place(x=40, y=105)
+    htl_name_entry = tk.OptionMenu(add_review_prompt, htl_name, *hotels)
+    htl_name.set(hotels[0])
+    htl_name_entry.place(x = 180, y=105)
+
+    source_label = tk.Label(add_review_prompt, text='Source')
+    source_label.place(x=40, y=180)
+    source_entry = tk.Entry(add_review_prompt, textvariable=source)
+    source_entry.place(x = 180, y=180)
+
+    review_label = tk.Label(add_review_prompt, text='Review')
+    review_label.place(x=40, y=255)
+    review_entry = tk.Text(add_review_prompt, height= 5, width= 25)
+    review_entry.place(x = 180, y=255)
+
+    rating_label = tk.Label(add_review_prompt, text='Rating')
+    rating_label.place(x=40, y=405)
+    rating_entry = tk.OptionMenu(add_review_prompt, rating, *ratings)
+    rating.set(ratings[0])
+    rating_entry.place(x = 180, y=405)
+
+    submit_review_button = tk.Button(add_review_prompt, text='Submit', width=10, height=1,bg='grey', command=add_review)
+    submit_review_button.place(x=250,y=480)
+
+    w =add_review_prompt.winfo_reqwidth()
+    h =add_review_prompt.winfo_reqheight()
+    ws=add_review_prompt.winfo_screenwidth()
+    hs =add_review_prompt.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    add_review_prompt.geometry('+%d+%d' % (x, y))
+    add_review_prompt.mainloop()
+
+
+def add_review():
+    c_id_data = c_id.get()
+    htl_name_data = htl_name.get()
+    source_data = source.get()
+    rating_data = rating.get()
+    review_data = review_entry.get("1.0", "end")
+
+    try:
+
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+        htel_id_query = 'select hotel_id from hotel where name=%s'
+        cur.execute(htel_id_query, htl_name_data)
+        hotel_id_rows = cur.fetchall()
+        htel_id = hotel_id_rows[0]['hotel_id']
+
+        insert_review_query = "insert into `review` (`customer_id`, `hotel_id`, `rating`, `comment`, `source`) values (%s,%s,%s,%s,%s)"
+        cur.execute(insert_review_query, (c_id_data, htel_id, rating_data, review_data, source_data,))
+        con.commit()
+        cur.close()
+        con.close()
+        messagebox.showinfo(title='Confirmation', message='Review Added Successfully')
+    except pymysql.err.OperationalError as e:
+        print('Error is: ')
+
+
+    c_id_data = c_id.set(0)
+    htl_name_data = htl_name.set('The Golden Gate Hotel')
+    source_data = source.set('')
+    rating_data = rating.set(1)
+    add_review_prompt.destroy()
+
 
 def payment_screen_launch():
     # TODO
