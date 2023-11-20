@@ -6,6 +6,7 @@ from tkinter import messagebox
 import connection
 import pymysql
 import config
+from datetime import date
 
 
 def customer_dashboard():
@@ -55,7 +56,7 @@ def customer_dashboard():
 
     # Payment Menu
     payment_menu = tk.Menu(menubar,tearoff=0)
-    payment_menu.add_command(label='Make Payment',command=payment_screen_launch)
+    payment_menu.add_command(label='Make Payment',command=payment_helper)
     menubar.add_cascade(label="Payment",menu=payment_menu)
 
     # Logout Menu
@@ -885,9 +886,125 @@ def add_review():
     add_review_prompt.destroy()
 
 
+def payment_helper():
+    global payment_helper_screen
+    global r_id
+    payment_helper_screen = tk.Toplevel(customer_dashboard_screen)
+    payment_helper_screen.geometry('400x200')
+    payment_helper_screen.title('Reservation Details')
+    
+    r_id = tk.IntVar()
+
+    r_id_label = tk.Label(payment_helper_screen, text='Reservation Id')
+    r_id_label.place(x=40, y=30)
+    r_id_entry = tk.Entry(payment_helper_screen, textvariable=r_id)
+    r_id_entry.place(x = 140, y=30)
+
+    resv_id_button = tk.Button(payment_helper_screen, text='Submit', width=10, height=1,bg='grey', command=payment_screen_launch)
+    resv_id_button.place(x=150,y=150)
+
+    w =payment_helper_screen.winfo_reqwidth()
+    h =payment_helper_screen.winfo_reqheight()
+    ws=payment_helper_screen.winfo_screenwidth()
+    hs =payment_helper_screen.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    payment_helper_screen.geometry('+%d+%d' % (x, y))
+    payment_helper_screen.mainloop()
+    
+
+
 def payment_screen_launch():
-    # TODO
-    pass
+    r_id_data = r_id.get()
+    payment_helper_screen.destroy()
+
+
+    global payment_screen
+    payment_screen = tk.Toplevel(customer_dashboard_screen)
+    payment_screen.geometry('400x400')
+    payment_screen.title('Payment Details')
+    global amount
+    global payment_mode
+    global payment_date
+    amount = tk.IntVar()
+    payment_mode = tk.StringVar()
+    payment_date = tk.StringVar()
+
+    mysql_creds = config.get_mysql_creds()
+    conObj = connection.Connect(mysql_creds)
+    con = conObj.make_connection()
+    cur = con.cursor()
+
+    payment_params = 'select rd.room_id, r.checkin_date, r.checkout_date, r.guest_count from reservationDetails rd INNER Join reservation r ON r.reservation_id = rd.reservation_id WHERE r.reservation_id = %s;'
+    cur.execute(payment_params, r_id_data)
+    results = cur.fetchall()
+
+
+    price_query='select CALCULATE_TOTAL_PRICE(%s,%s,%s,%s) as total_price'
+    cur.execute(price_query, (results[0]['checkin_date'], results[0]['checkout_date'], results[0]['room_id'],results[0]['guest_count']))
+    func_results = cur.fetchall()
+    price = func_results[0]['total_price']
+
+    cur.close()
+    con.close()
+
+    amount_label = tk.Label(payment_screen, text='Amount')
+    amount_label.place(x=40, y=30)
+    amount_entry = tk.Entry(payment_screen, textvariable=amount)
+    amount_entry.place(x = 150, y=30)
+    amount.set(price)
+
+    payment_mode_label = tk.Label(payment_screen, text='Payment Mode')
+    payment_mode_label.place(x=40, y=105)
+    payment_mode_entry = tk.Entry(payment_screen, textvariable=payment_mode)
+    payment_mode_entry.place(x = 150, y=105)
+
+    payment_date_label = tk.Label(payment_screen, text='Date')
+    payment_date_label.place(x=40, y=180)
+    payment_date_entry = tk.Entry(payment_screen, textvariable=payment_date)
+    payment_date_entry.place(x = 150, y=180)
+    payment_date.set(get_today())
+
+    payment_button = tk.Button(payment_screen, text='Submit', width=10, height=1,bg='grey', command=submit_payment)
+    payment_button.place(x=150,y=250)
+
+    w =payment_screen.winfo_reqwidth()
+    h =payment_screen.winfo_reqheight()
+    ws=payment_screen.winfo_screenwidth()
+    hs =payment_screen.winfo_screenheight()
+    x = (ws/2) - (w/2) - 100
+    y = (hs/2) - (h/2) - 100 
+    payment_screen.geometry('+%d+%d' % (x, y))
+    payment_screen.mainloop()
+
+def submit_payment():
+    amount_data = amount.get()
+    payment_date_data = payment_date.get()
+    payment_mode_data = payment_mode.get()
+
+    try:
+        mysql_creds = config.get_mysql_creds()
+        conObj = connection.Connect(mysql_creds)
+        con = conObj.make_connection()
+        cur = con.cursor()
+       
+
+        insert_payment_query = "insert into `payment` (`amount`, `type`, `date`) values (%s,%s,%s)"
+        cur.execute(insert_payment_query, (amount_data, payment_mode_data, payment_date_data,))
+        con.commit()
+        cur.close()
+        con.close()
+        messagebox.showinfo(title='Confirmation', message='Payment Submitted Successfully')
+    except pymysql.err.OperationalError as e:
+        print('Error is: ')
+
+    amount.set(0)
+    payment_mode.set('')
+    payment_date.set('')
+    payment_screen.destroy()
+
+def get_today():
+    return str(date.today())
 
 def kill_customer_dashboard():
     customer_dashboard_screen.destroy()
