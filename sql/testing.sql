@@ -1,7 +1,7 @@
 -- Script to test GetAvailableRoom and ReserveRoom procedures
 
 -- Step 1: Get available room
-CALL GetAvailableRoom(1, '2023-12-01', '2023-12-02', @available_room_id);
+CALL GetAvailableRoom(101, 1, '2023-12-01', '2023-12-02', @available_room_id);
 
 -- Display available room ID
 SELECT 'Available Room ID:', @available_room_id AS 'Room ID';

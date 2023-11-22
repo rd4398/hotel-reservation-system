@@ -80,16 +80,13 @@ CALL AddCustomer('Jo', 'Doe', 'jon.e@example.com', '123-456-7890', '1990-01-01')
 
 DELIMITER //
 
-CREATE PROCEDURE GetAvailableRoom(IN room_type_id INT, IN checkin_date DATE, IN checkout_date DATE, OUT next_room_id INT)
+CREATE PROCEDURE GetAvailableRoom(IN hotel_id INT, IN room_type_id INT, IN checkin_date DATE, IN checkout_date DATE, OUT next_room_id INT)
 BEGIN
     -- Check if there is an entry in roomAvailability for the given room type and date range
-    SELECT MAX(room_id) INTO next_room_id
+    SELECT MIN(ra.room_id) INTO next_room_id
     FROM roomAvailability ra
-    WHERE ra.room_id = (
-        SELECT MAX(r.room_id)
-        FROM room r
-        WHERE r.room_type_id = room_type_id
-    )
+    WHERE ra.room_type_id = room_type_id
+    AND ra.hotel_id = hotel_id
     AND ra.date BETWEEN checkin_date AND checkout_date
     AND ra.is_available = 1;
 

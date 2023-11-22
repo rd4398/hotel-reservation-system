@@ -49,7 +49,7 @@ CREATE TABLE reservation (
     checkout_date DATE NOT NULL,
     guest_count INT NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (hotel_id) REFERENCES hotel(hotel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- ReservationDetails Table
@@ -116,6 +116,8 @@ CREATE TABLE review (
 CREATE TABLE roomAvailability (
     availability_id INT PRIMARY KEY AUTO_INCREMENT,
     room_id INT,
+    hotel_id INT,
+    room_type_id INT,
     is_available BOOLEAN NOT NULL,
     date DATE NOT NULL,
     cleaning_status VARCHAR(50),
@@ -177,35 +179,6 @@ INSERT INTO room (room_id, room_number, room_type_id, hotel_id, price) VALUES
 (307, 203, 3, 102, 220.00),
 (308, 204, 1, 102, 90.00),
 (309, 205, 2, 102, 140.00);
-
-
-
-
-
-INSERT INTO reservation (reservation_id, customer_id, hotel_id, checkin_date, checkout_date, total_price, guest_count) VALUES
-(3001, 1001, 101, '2023-11-10', '2023-11-15', 500.00, 3),
-(3002, 1002, 102,'2023-11-12', '2023-11-14', 300.00, 2),
-(3003, 1003,103, '2023-11-15', '2023-11-20', 750.00, 1),
-(3004, 1004, 103,'2023-11-18', '2023-11-22', 600.00, 2),
-(3005, 1005,101, '2023-11-20', '2023-11-25', 900.00, 3),
-(3006, 1006, 106,'2023-11-21', '2023-11-26', 450.00, 1),
-(3007, 1007,104 ,'2023-11-23', '2023-11-28', 550.00, 1),
-(3008, 1008,105, '2023-11-25', '2023-11-30', 650.00, 1),
-(3009, 1009, 102,'2023-11-28', '2023-12-03', 700.00, 1),
-(3010, 1010,101, '2023-12-01', '2023-12-05', 800.00, 3);
-
-
-INSERT INTO reservationDetails (reservation_id, room_id, guest_count) VALUES
-(3001, 300, 3),
-(3002, 301, 2),
-(3003, 302, 1),
-(3004, 303, 2),
-(3005, 304, 3),
-(3006, 305, 1),
-(3007, 306, 1),
-(3008, 307, 1),
-(3009, 308, 1),
-(3010, 309, 3);
 
 
 INSERT INTO activity (activity_id, name, description, price, type) VALUES
@@ -273,36 +246,36 @@ INSERT INTO review (review_id, customer_id, hotel_id, rating, comment, source) V
 (10, 1010, 105, 1, 'Unsatisfactory experience, would not recommend.', 'In-person');
 
 
-INSERT INTO roomAvailability (availability_id, room_id, is_available, date, cleaning_status) VALUES
-(1, 300, TRUE, '2023-12-01', 'Cleaned'),
-(2, 301, TRUE, '2023-12-01', 'Cleaned'),
-(3, 302, TRUE, '2023-12-01', 'Cleaned'),
-(4, 303, TRUE, '2023-12-01', 'Cleaned'),
-(5, 304, TRUE, '2023-12-01', 'Cleaned'),
-(6, 305, TRUE, '2023-12-01', 'Cleaned'),
-(7, 306, TRUE, '2023-12-01', 'Cleaned'),
-(8, 307, TRUE, '2023-12-01', 'Cleaned'),
-(9, 308, TRUE, '2023-12-01', 'Cleaned'),
-(10, 309, TRUE, '2023-12-01', 'Cleaned'),
-(11, 300, TRUE, '2023-12-02', 'Cleaned'),
-(12, 301, TRUE, '2023-12-02', 'Cleaned'),
-(13, 302, TRUE, '2023-12-02', 'Cleaned'),
-(14, 303, TRUE, '2023-12-02', 'Cleaned'),
-(15, 304, TRUE, '2023-12-02', 'Cleaned'),
-(16, 305, TRUE, '2023-12-02', 'Cleaned'),
-(17, 306, TRUE, '2023-12-02', 'Cleaned'),
-(18, 307, TRUE, '2023-12-02', 'Cleaned'),
-(19, 308, TRUE, '2023-12-02', 'Cleaned'),
-(20, 309, TRUE, '2023-12-02', 'Cleaned'),
-(21, 300, TRUE, '2023-12-03', 'Cleaned'),
-(22, 301, TRUE, '2023-12-03', 'Cleaned'),
-(23, 302, TRUE, '2023-12-03', 'Cleaned'),
-(24, 303, TRUE, '2023-12-03', 'Cleaned'),
-(25, 304, TRUE, '2023-12-03', 'Cleaned'),
-(26, 305, TRUE, '2023-12-03', 'Cleaned'),
-(27, 306, TRUE, '2023-12-03', 'Cleaned'),
-(28, 307, TRUE, '2023-12-03', 'Cleaned'),
-(29, 308, TRUE, '2023-12-03', 'Cleaned'),
-(30, 309, TRUE, '2023-12-03', 'Cleaned');
+INSERT INTO roomAvailability (availability_id, room_id, hotel_id, room_type_id, is_available, date, cleaning_status) VALUES
+(1, 300,101, 1, TRUE, '2023-12-01', 'Cleaned'),
+(2, 301,101,2, TRUE, '2023-12-01', 'Cleaned'),
+(3, 302,101,1, TRUE, '2023-12-01', 'Cleaned'),
+(4, 303,101,3, TRUE, '2023-12-01', 'Cleaned'),
+(5, 304,101,2, TRUE, '2023-12-01', 'Cleaned'),
+(6, 305,102,1, TRUE, '2023-12-01', 'Cleaned'),
+(7, 306,102,2, TRUE, '2023-12-01', 'Cleaned'),
+(8, 307,102,3, TRUE, '2023-12-01', 'Cleaned'),
+(9, 308,102,1, TRUE, '2023-12-01', 'Cleaned'),
+(10, 309,102,2, TRUE, '2023-12-01', 'Cleaned'),
+(11, 300,101,1, TRUE, '2023-12-02', 'Cleaned'),
+(12, 301,101,2, TRUE, '2023-12-02', 'Cleaned'),
+(13, 302,101,1, TRUE, '2023-12-02', 'Cleaned'),
+(14, 303,101,3, TRUE, '2023-12-02', 'Cleaned'),
+(15, 304,101,2, TRUE, '2023-12-02', 'Cleaned'),
+(16, 305,102,1, TRUE, '2023-12-02', 'Cleaned'),
+(17, 306,102,2, TRUE, '2023-12-02', 'Cleaned'),
+(18, 307,102,3, TRUE, '2023-12-02', 'Cleaned'),
+(19, 308,102,1, TRUE, '2023-12-02', 'Cleaned'),
+(20, 309,102,2, TRUE, '2023-12-02', 'Cleaned'),
+(21, 300,101,1, TRUE, '2023-12-03', 'Cleaned'),
+(22, 301,101,2, TRUE, '2023-12-03', 'Cleaned'),
+(23, 302,101,1, TRUE, '2023-12-03', 'Cleaned'),
+(24, 303,101,3, TRUE, '2023-12-03', 'Cleaned'),
+(25, 304,101,2, TRUE, '2023-12-03', 'Cleaned'),
+(26, 305,102,1, TRUE, '2023-12-03', 'Cleaned'),
+(27, 306,102,2, TRUE, '2023-12-03', 'Cleaned'),
+(28, 307,102,3, TRUE, '2023-12-03', 'Cleaned'),
+(29, 308,102,1, TRUE, '2023-12-03', 'Cleaned'),
+(30, 309,102,2, TRUE, '2023-12-03', 'Cleaned');
 
 
