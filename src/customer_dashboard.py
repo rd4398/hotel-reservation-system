@@ -54,11 +54,6 @@ def customer_dashboard():
     review_menu.add_command(label='Add Review', command=add_review_screen_launch)
     menubar.add_cascade(label="Review",menu=review_menu)
 
-    # Payment Menu
-    payment_menu = tk.Menu(menubar,tearoff=0)
-    payment_menu.add_command(label='Make Payment',command=payment_helper)
-    menubar.add_cascade(label="Payment",menu=payment_menu)
-
     # Logout Menu
     logout_menu = tk.Menu(menubar,tearoff=0)
     logout_menu.add_command(label='Exit',command=kill_customer_dashboard)
@@ -223,26 +218,13 @@ def reserve_hotel():
         cur.execute(hotel_id_query, hotel_name_data)
         rows = cur.fetchall()
         htel_id = rows[0]['hotel_id']
-        
 
-
-        insert_reservation_query = "insert into `reservation` (`hotel_id`, `customer_id`, `checkin_date`, `checkout_date`, `total_price`, `guest_count`) values (%s,%s,%s,%s,%s,%s)"
-        cur.execute(insert_reservation_query, (htel_id, cust_id, check_in_date_data, check_out_date_data, 500, num_guests_data,))
-        con.commit()
-
-        get_resv_id = "SELECT reservation_id FROM reservation ORDER BY reservation_id DESC LIMIT 1"
-        cur.execute(get_resv_id)
+        rm_type_id_query = "select room_type_id from roomType where type_name=%s"
+        cur.execute(rm_type_id_query, room_type_data)
         rows = cur.fetchall()
-        resv_id = rows[0]['reservation_id']
+        rm_type_id = rows[0]['room_type_id']
 
-        rm_id_query = 'select rm.room_id from room rm inner join roomType rt on rt.room_type_id = rm.room_type_id where rt.type_name = %s limit 1'
-        cur.execute(rm_id_query, room_type_data)
-        rows = cur.fetchall()
-        rm_id = rows[0]['room_id']
-
-
-        insert_reservation_detail_query = "insert into `reservationDetails` (`reservation_id`, `room_id`, `guest_count`) values (%s,%s,%s)"
-        cur.execute(insert_reservation_detail_query, (resv_id, rm_id, num_guests_data))
+        cur.callproc("BookRoom", (cust_id, num_guests_data, htel_id, rm_type_id, check_in_date_data, check_out_date_data))
         con.commit()
 
         activity_id_query = "select activity_id from activity where name=%s"
@@ -253,6 +235,13 @@ def reserve_hotel():
         insert_activity_booking_query = "insert into `activityBooking` (`activity_id`, `customer_id`, `date`) values (%s,%s,%s)"
         cur.execute(insert_activity_booking_query, (act_id, cust_id, activity_date_data))
         con.commit()
+
+        get_last_resv_query = "SELECT reservation_id FROM reservation ORDER BY reservation_id DESC LIMIT 1"
+        cur.execute(get_last_resv_query)
+        rows = cur.fetchall()
+        cust_id = rows[0]['reservation_id']
+
+
         cur.close()
         con.close()
 
@@ -884,124 +873,6 @@ def add_review():
     source_data = source.set('')
     rating_data = rating.set(1)
     add_review_prompt.destroy()
-
-
-def payment_helper():
-    global payment_helper_screen
-    global r_id
-    payment_helper_screen = tk.Toplevel(customer_dashboard_screen)
-    payment_helper_screen.geometry('400x200')
-    payment_helper_screen.title('Reservation Details')
-    
-    r_id = tk.IntVar()
-
-    r_id_label = tk.Label(payment_helper_screen, text='Reservation Id')
-    r_id_label.place(x=40, y=30)
-    r_id_entry = tk.Entry(payment_helper_screen, textvariable=r_id)
-    r_id_entry.place(x = 140, y=30)
-
-    resv_id_button = tk.Button(payment_helper_screen, text='Submit', width=10, height=1,bg='grey', command=payment_screen_launch)
-    resv_id_button.place(x=150,y=150)
-
-    w =payment_helper_screen.winfo_reqwidth()
-    h =payment_helper_screen.winfo_reqheight()
-    ws=payment_helper_screen.winfo_screenwidth()
-    hs =payment_helper_screen.winfo_screenheight()
-    x = (ws/2) - (w/2) - 100
-    y = (hs/2) - (h/2) - 100 
-    payment_helper_screen.geometry('+%d+%d' % (x, y))
-    payment_helper_screen.mainloop()
-    
-
-
-def payment_screen_launch():
-    r_id_data = r_id.get()
-    payment_helper_screen.destroy()
-
-
-    global payment_screen
-    payment_screen = tk.Toplevel(customer_dashboard_screen)
-    payment_screen.geometry('400x400')
-    payment_screen.title('Payment Details')
-    global amount
-    global payment_mode
-    global payment_date
-    amount = tk.IntVar()
-    payment_mode = tk.StringVar()
-    payment_date = tk.StringVar()
-
-    mysql_creds = config.get_mysql_creds()
-    conObj = connection.Connect(mysql_creds)
-    con = conObj.make_connection()
-    cur = con.cursor()
-
-    payment_params = 'select rd.room_id, r.checkin_date, r.checkout_date, r.guest_count from reservationDetails rd INNER Join reservation r ON r.reservation_id = rd.reservation_id WHERE r.reservation_id = %s;'
-    cur.execute(payment_params, r_id_data)
-    results = cur.fetchall()
-
-
-    price_query='select CALCULATE_TOTAL_PRICE(%s,%s,%s,%s) as total_price'
-    cur.execute(price_query, (results[0]['checkin_date'], results[0]['checkout_date'], results[0]['room_id'],results[0]['guest_count']))
-    func_results = cur.fetchall()
-    price = func_results[0]['total_price']
-
-    cur.close()
-    con.close()
-
-    amount_label = tk.Label(payment_screen, text='Amount')
-    amount_label.place(x=40, y=30)
-    amount_entry = tk.Entry(payment_screen, textvariable=amount)
-    amount_entry.place(x = 150, y=30)
-    amount.set(price)
-
-    payment_mode_label = tk.Label(payment_screen, text='Payment Mode')
-    payment_mode_label.place(x=40, y=105)
-    payment_mode_entry = tk.Entry(payment_screen, textvariable=payment_mode)
-    payment_mode_entry.place(x = 150, y=105)
-
-    payment_date_label = tk.Label(payment_screen, text='Date')
-    payment_date_label.place(x=40, y=180)
-    payment_date_entry = tk.Entry(payment_screen, textvariable=payment_date)
-    payment_date_entry.place(x = 150, y=180)
-    payment_date.set(get_today())
-
-    payment_button = tk.Button(payment_screen, text='Submit', width=10, height=1,bg='grey', command=submit_payment)
-    payment_button.place(x=150,y=250)
-
-    w =payment_screen.winfo_reqwidth()
-    h =payment_screen.winfo_reqheight()
-    ws=payment_screen.winfo_screenwidth()
-    hs =payment_screen.winfo_screenheight()
-    x = (ws/2) - (w/2) - 100
-    y = (hs/2) - (h/2) - 100 
-    payment_screen.geometry('+%d+%d' % (x, y))
-    payment_screen.mainloop()
-
-def submit_payment():
-    amount_data = amount.get()
-    payment_date_data = payment_date.get()
-    payment_mode_data = payment_mode.get()
-
-    try:
-        mysql_creds = config.get_mysql_creds()
-        conObj = connection.Connect(mysql_creds)
-        con = conObj.make_connection()
-        cur = con.cursor()
-       
-
-        insert_payment_query = "insert into `payment` (`amount`, `type`, `date`) values (%s,%s,%s)"
-        cur.execute(insert_payment_query, (amount_data, payment_mode_data, payment_date_data,))
-        con.commit()
-        cur.close()
-        con.close()
-        messagebox.showinfo(title='Confirmation', message='Payment Submitted Successfully')
-    except pymysql.err.OperationalError as e:
-        print('Error is: ')
-
-    amount.set(0)
-    payment_mode.set('')
-    payment_date.set('')
-    payment_screen.destroy()
 
 def get_today():
     return str(date.today())
