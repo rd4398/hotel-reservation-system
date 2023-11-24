@@ -9,7 +9,7 @@ JOIN
 GROUP BY
     h.hotel_id
 ORDER BY
-    average_rating
+    average_rating;
 
 CREATE VIEW mostBookedActivities AS
 SELECT
@@ -20,6 +20,7 @@ FROM
 JOIN
     activityBooking ab ON a.activity_id = ab.activity_id
 GROUP BY
-    a.activity_id;
+    a.activity_id
 ORDER BY
-times_booked DESC
+times_booked DESC;
+

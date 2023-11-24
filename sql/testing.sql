@@ -16,3 +16,12 @@ SELECT 'Reserved Room ID:', @reserved_room_id AS 'Room ID';
 SELECT * FROM reservation;
 SELECT * FROM reservationDetails;
 SELECT * FROM roomAvailability
+
+-- Use Total Bill Function:
+SELECT CALCULATE_TOTAL_BILL(1001, '2023-11-15', '2023-11-20') AS total_bill;
+
+-- Use Increment Salary Function
+SELECT INCREMENT_SALARY(5001)
+
+-- Testing Booking room using wrapper (use dates 2023-12-01 to 2023-12-03 only because roomAvailability only has dates for those add more to book other dates)
+CALL BookRoom(1002, 2, 101, 1, '2023-12-01','2023-12-02')
