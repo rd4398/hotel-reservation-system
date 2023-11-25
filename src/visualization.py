@@ -1,26 +1,32 @@
-import connection
+import pymysql
 import matplotlib.pyplot as plt
 import config
-import pymysql
+import connection
 
 def get_analysis():
     try:
+        # Establish database connection using credentials from config
         mysql_creds = config.get_mysql_creds()
         conObj = connection.Connect(mysql_creds)
         con = conObj.make_connection()
         cursor = con.cursor()
+
+        # Fetch data from the highestRatedHotels view
         cursor.execute("SELECT * FROM highestRatedHotels")
         result_hotels = cursor.fetchall()
 
+        # Fetch data from the mostBookedActivities view
         cursor.execute("SELECT * FROM mostBookedActivities")
         result_activities = cursor.fetchall()
 
-        hotel_names = [row[0] for row in result_hotels]
-        average_ratings = [row[1] for row in result_hotels]
+        # Extract data using column names as keys
+        hotel_names = [row['hotel_name'] for row in result_hotels]
+        average_ratings = [row['average_rating'] for row in result_hotels]
 
-        activity_names = [row[0] for row in result_activities]
-        times_booked = [row[1] for row in result_activities]
+        activity_names = [row['activity_name'] for row in result_activities]
+        times_booked = [row['times_booked'] for row in result_activities]
 
+        # Plotting the results
         plt.figure(figsize=(12, 6))
 
         # Plot for highest rated hotels
@@ -37,8 +43,10 @@ def get_analysis():
 
         plt.tight_layout()
         plt.show()
+
+        # Close the cursor and connection
         cursor.close()
         con.close()
 
     except pymysql.err.OperationalError as e:
-        print('Error is: '+ str(e))
+        print('Error is: ' + str(e))
