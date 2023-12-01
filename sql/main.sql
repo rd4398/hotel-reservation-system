@@ -95,9 +95,11 @@ CREATE TABLE employee (
 -- Payment Table
 CREATE TABLE payment (
     payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT,
     amount DECIMAL(10, 2) NOT NULL,
     type VARCHAR(50),
-    date DATE NOT NULL
+    date DATE NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Review Table

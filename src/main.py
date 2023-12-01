@@ -7,6 +7,7 @@ import connection
 import login
 import visualization
 import pymysql
+from datetime import date
 
 
 # Get mysql creds from config file
@@ -46,8 +47,13 @@ while True:
                     conn.commit()
                     result = cur.fetchone()
                     bill = result['total_bill']
-                    cur.close()
                     print("The total bill for customer is: ", str(bill))
+                    payment_type = input("Enter the payment type (credit card / cash): ")
+
+                    insert_payment_query = 'insert into `payment` (`customer_id`,`amount`,`type`, `date`) values (%s, %s,%s,%s)'
+                    cur.execute(insert_payment_query, (customer_id, bill, payment_type, str(date.today())))
+                    conn.commit()
+                    cur.close()
 
                 except pymysql.err.OperationalError as e:
                     print('Error is: '+ str(e))
