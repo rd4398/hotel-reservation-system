@@ -239,8 +239,7 @@ def reserve_hotel():
         get_last_resv_query = "SELECT reservation_id FROM reservation ORDER BY reservation_id DESC LIMIT 1"
         cur.execute(get_last_resv_query)
         rows = cur.fetchall()
-        cust_id = rows[0]['reservation_id']
-
+        resv_id = rows[0]['reservation_id']
 
         cur.close()
         con.close()
