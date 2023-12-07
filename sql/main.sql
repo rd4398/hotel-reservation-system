@@ -126,6 +126,12 @@ CREATE TABLE roomAvailability (
     FOREIGN KEY (room_id) REFERENCES room(room_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Create the auth table manually if required
+Create table if not exists auth(
+    username varchar(50) primary key, 
+    password varchar(50) not null
+    );
+
 
 -- Insert sample values in customer table
 INSERT INTO customer (customer_id, first_name, last_name, email, phone, DOB) VALUES
@@ -283,4 +289,7 @@ INSERT INTO roomAvailability (availability_id, room_id, hotel_id, room_type_id, 
 (29, 308,102,1, TRUE, '2023-12-09', 'Cleaned'),
 (30, 309,102,2, TRUE, '2023-12-09', 'Cleaned');
 
+-- Insert into auth
 
+Insert into `auth` (`username`, `password`)
+('rohan.dev', 'rohan@123');
