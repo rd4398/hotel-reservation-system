@@ -1,3 +1,5 @@
+-- Trigger to update room availibility after reservation is made
+
 DELIMITER //
 
 CREATE TRIGGER UpdateRoomAvailabilityAfterReservation

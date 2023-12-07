@@ -1,9 +1,17 @@
+'''
+This file contains python script to generate the bar graphs as part of the data analysis
+for the hotel reservation system. It uses the SQL views to plot the graphs. 
+'''
+# Import the required libraries like matplotlib
 import pymysql
 import matplotlib.pyplot as plt
 import config
 import connection
 
 def get_analysis():
+    '''
+    Connect to MySQL, get the data required for the plots
+    '''
     try:
         mysql_creds = config.get_mysql_creds()
         conObj = connection.Connect(mysql_creds)
@@ -19,6 +27,8 @@ def get_analysis():
 
         activity_names = [row['activity_name'] for row in result_activities]
         times_booked = [row['times_booked'] for row in result_activities]
+
+        # Plot the figure for highest rated hotels
 
         plt.figure(figsize=(12, 6))
 

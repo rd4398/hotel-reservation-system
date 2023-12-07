@@ -1,3 +1,5 @@
+-- View for highest rated hotels
+
 CREATE VIEW highestRatedHotels AS
 SELECT
     h.name AS hotel_name,
@@ -10,6 +12,8 @@ GROUP BY
     h.hotel_id
 ORDER BY
     average_rating;
+
+-- View for most booked activities
 
 CREATE VIEW mostBookedActivities AS
 SELECT

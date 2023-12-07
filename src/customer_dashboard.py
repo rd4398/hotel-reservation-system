@@ -1,6 +1,8 @@
 '''
 This file will contain the UI and functionalities associated with customers making reservations at the hotels
 '''
+
+# Import the required libraries like tkinter
 import tkinter as tk
 from tkinter import messagebox
 import connection
@@ -8,8 +10,9 @@ import pymysql
 import config
 from datetime import date
 
-
+# The UI for customer dashboard where customer can reserve the hotel and access other features
 def customer_dashboard():
+    # Declare the variables
     global customer_dashboard_screen
     global first_name
     global last_name
@@ -30,6 +33,8 @@ def customer_dashboard():
     customer_dashboard_screen.title('Customer Dashboard')
     menubar = tk.Menu(customer_dashboard_screen)
     customer_dashboard_screen.config(menu=menubar)
+
+    # Set the menu bar
 
     # Customer Menu
     customer_account_menu = tk.Menu(menubar,tearoff=0)
@@ -107,7 +112,7 @@ def customer_dashboard():
     for r in activity_rows:
         activity_list.append(r['name'])
 
-   
+   # Set the labels and entry fields along with drop down lists.
     first_name_label = tk.Label(customer_dashboard_screen, text='First Name')
     first_name_label.place(x=70, y=100)
     first_name_entry = tk.Entry(customer_dashboard_screen, textvariable=first_name)
@@ -185,6 +190,7 @@ def customer_dashboard():
     customer_dashboard_screen.geometry('+%d+%d' % (x, y))
     customer_dashboard_screen.mainloop()
 
+# The function which reserves the hotel for the customer. It is triggered as soon as customer clicks reserve 
 def reserve_hotel():
     first_name_data = first_name.get()
     last_name_data = last_name.get()
@@ -198,7 +204,8 @@ def reserve_hotel():
     activity_data = activity.get()
     activity_date_data = activity_date.get()
     num_guests_data = num_guests.get()
-
+    
+    # Connect to MySQL and execute queries, stored procedures to make reservation for the customer
     try:
 
         mysql_creds = config.get_mysql_creds()
@@ -246,7 +253,8 @@ def reserve_hotel():
 
     except pymysql.err.OperationalError as e:
         print('Error is: '+ str(e))
-
+    
+    # Clear all the text entry fields when reservation is successful
     messagebox.showinfo(title='Confirmation', message='Customer ID: '+str(cust_id)+'\n'+ 'Reservation ID: '+str(resv_id))
     first_name.set('')
     last_name.set('')
@@ -261,7 +269,7 @@ def reserve_hotel():
     activity_date.set('')
     num_guests.set('')
 
-
+# The UI prompt for fetching customer reservation. It accepts customer id as input
 def get_reservation_screen():
     global lookup_reservation_screen
     lookup_reservation_screen = tk.Toplevel(customer_dashboard_screen)
@@ -287,6 +295,7 @@ def get_reservation_screen():
     lookup_reservation_screen.geometry('+%d+%d' % (x, y))
     lookup_reservation_screen.mainloop()
 
+# Helper to fetch the reservation. It connects to the database and gets the requested record for the customer
 def get_reservation_helper():
     resv_id_data = resv_id.get()
     global f_name
@@ -333,6 +342,7 @@ def get_reservation_helper():
         print('Error is: '+ str(e))
     return flag
 
+# UI to show the reservation details after the fetch reservation is successful and data is fetched from database
 def get_reservation():
     lookup_reservation_screen.destroy()
     result = get_reservation_helper()
@@ -396,7 +406,7 @@ def get_reservation():
         lookup_result_screen.mainloop()
 
 
-
+# The UI prompt for fetching account information for customer. It accepts customer id as input
 def get_account_screen():
     global lookup_customer_screen
     lookup_customer_screen = tk.Toplevel(customer_dashboard_screen)
@@ -422,6 +432,7 @@ def get_account_screen():
     lookup_customer_screen.geometry('+%d+%d' % (x, y))
     lookup_customer_screen.mainloop()
 
+# Helper to fetch the customer account. It connects to the database and gets the requested record for the customer account
 def get_customer_helper():
     cust_id_data = cust_id.get()
     global f_name
@@ -459,6 +470,7 @@ def get_customer_helper():
         print('Error is: '+ str(e))
     return flag
 
+# UI to show the customer details after the fetch account is successful and data is fetched from database
 def get_customer():
     lookup_customer_screen.destroy()
     result = get_customer_helper()
@@ -505,6 +517,7 @@ def get_customer():
         lookup_result_screen.geometry('+%d+%d' % (x, y))
         lookup_result_screen.mainloop()
 
+# UI to update the customer account details. It shows the necessary fields to update for a customer
 def update_account_screen():
     global update_account_prompt
     update_account_prompt = tk.Toplevel(customer_dashboard_screen)
@@ -544,6 +557,7 @@ def update_account_screen():
     update_account_prompt.geometry('+%d+%d' % (x, y))
     update_account_prompt.mainloop()
 
+# The update account functionality when user clicks update button from UI
 def update_customer():
     upd_cust_id_data = upd_cust_id.get()
     new_phn_data = new_phn.get()
@@ -566,6 +580,7 @@ def update_customer():
     new_email.set(0)
     update_account_prompt.destroy()
 
+# The delete account UI prompt which takes customer_id as input for deleting the account
 def delete_account_prompt():
     global delete_account_screen
     delete_account_screen = tk.Toplevel(customer_dashboard_screen)
@@ -591,6 +606,7 @@ def delete_account_prompt():
     delete_account_screen.geometry('+%d+%d' % (x, y))
     delete_account_screen.mainloop()
 
+# The delete account functionality as soon as the customer clicks delete button on the UI
 def delete_customer():
     del_cust_id_data = del_cust_id.get()
     try:
@@ -610,6 +626,7 @@ def delete_customer():
     del_cust_id.set(0)
     delete_account_screen.destroy()
 
+# UI to update the reservation details. It shows the necessary fields to update for a reservation
 def update_reservation_screen():
     global update_reservation_prompt
     update_reservation_prompt = tk.Toplevel(customer_dashboard_screen)
@@ -697,6 +714,7 @@ def update_reservation_screen():
     update_reservation_prompt.geometry('+%d+%d' % (x, y))
     update_reservation_prompt.mainloop()
 
+# The update reservation functionality when user clicks update button from UI
 def update_reservation():
     upd_resv_id_data = upd_resv_id.get()
     new_checkin_data = new_checkin.get()
@@ -725,8 +743,7 @@ def update_reservation():
     new_activity.set('Spa Day')
     update_reservation_prompt.destroy()
 
-
-
+# The delete reservation UI prompt which takes reservation_id as input for deleting the reservation
 def delete_reservation_prompt():
     global delete_reservation_screen
     delete_reservation_screen = tk.Toplevel(customer_dashboard_screen)
@@ -752,6 +769,7 @@ def delete_reservation_prompt():
     delete_reservation_screen.geometry('+%d+%d' % (x, y))
     delete_reservation_screen.mainloop()
 
+# The delete reservation functionality as soon as the customer clicks delete button on the UI
 def delete_reservation():
     del_resv_id_data = del_resv_id.get()
     try:
@@ -771,6 +789,7 @@ def delete_reservation():
     del_resv_id.set(0)
     delete_reservation_screen.destroy()
 
+# The UI to add review functionality for the customer
 def add_review_screen_launch():
     global add_review_prompt
     add_review_prompt = tk.Toplevel(customer_dashboard_screen)
@@ -838,7 +857,7 @@ def add_review_screen_launch():
     add_review_prompt.geometry('+%d+%d' % (x, y))
     add_review_prompt.mainloop()
 
-
+# Function to add the review to the database when user clicks add review on UI
 def add_review():
     c_id_data = c_id.get()
     htl_name_data = htl_name.get()
@@ -873,8 +892,10 @@ def add_review():
     rating_data = rating.set(1)
     add_review_prompt.destroy()
 
+# The function which gets todays date
 def get_today():
     return str(date.today())
 
+# The log out functionality
 def kill_customer_dashboard():
     customer_dashboard_screen.destroy()

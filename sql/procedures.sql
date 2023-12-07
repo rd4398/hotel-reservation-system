@@ -73,7 +73,9 @@ END //
 DELIMITER ;
 
 CALL AddCustomer('Jo', 'Doe', 'jon.e@example.com', '123-456-7890', '1990-01-01');
--- Get Available room for given room Id
+
+
+-- Procedure to Get Available room for given room Id
 
 DELIMITER //
 
@@ -100,7 +102,7 @@ END //
 DELIMITER ;
 
 
--- Reserve Room assuming each extra guest costs same
+-- Procedure to Reserve Room assuming each extra guest costs same
 
 DELIMITER //
 

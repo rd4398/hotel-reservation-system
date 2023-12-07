@@ -1,3 +1,5 @@
+-- Function to calculate the total price for the customer 
+
 DELIMITER //
 CREATE FUNCTION CALCULATE_TOTAL_PRICE(
     checkin_date_param DATE, 
@@ -19,6 +21,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Function to calculate the total price for the customer during checkout (includes activity price)
 DELIMITER //
 
 CREATE FUNCTION CALCULATE_TOTAL_BILL(
@@ -53,6 +56,7 @@ END //
 
 DELIMITER ;
 
+-- Function to increment salary for the employee
 DELIMITER //
 
 CREATE FUNCTION INCREMENT_SALARY(

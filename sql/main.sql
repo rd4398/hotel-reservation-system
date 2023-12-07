@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS hotel;
 
 USE hotel;
--- Customer Table
+-- Create command for Customer Table
 CREATE TABLE customer (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(255) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE customer (
     DOB DATE NOT NULL
 );
 
--- Hotel Table
+-- Create command for Hotel Table
 CREATE TABLE hotel (
     hotel_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -19,14 +19,14 @@ CREATE TABLE hotel (
     rating INT
 );
 
--- RoomType Table
+-- Create command for RoomType Table
 CREATE TABLE roomType (
     room_type_id INT PRIMARY KEY AUTO_INCREMENT,
     type_name VARCHAR(255) NOT NULL,
     description TEXT
 );
 
--- Room Table
+-- Create command for Room Table
 
 CREATE TABLE room (
     room_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -40,7 +40,7 @@ CREATE TABLE room (
 
 
 
--- Reservation Table
+-- Create command for Reservation Table
 CREATE TABLE reservation (
     reservation_id INT PRIMARY KEY AUTO_INCREMENT,
     customer_id INT,
@@ -52,7 +52,7 @@ CREATE TABLE reservation (
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (hotel_id) REFERENCES hotel(hotel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
--- ReservationDetails Table
+-- Create command for ReservationDetails Table
 CREATE TABLE reservationDetails (
     reservation_id INT,
     room_id INT,
@@ -61,7 +61,7 @@ CREATE TABLE reservationDetails (
     FOREIGN KEY (room_id) REFERENCES room(room_id) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (reservation_id,room_id)
 );
--- Activity Table
+-- Create command for Activity Table
 CREATE TABLE activity (
     activity_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE activity (
     type VARCHAR(255)
 );
 
--- ActivityBooking Table
+-- Create command for ActivityBooking Table
 CREATE TABLE activityBooking (
     booking_id INT PRIMARY KEY AUTO_INCREMENT,
     activity_id INT,
@@ -81,7 +81,7 @@ CREATE TABLE activityBooking (
 );
 
 
--- Employee Table
+-- Create command for Employee Table
 CREATE TABLE employee (
     employee_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE employee (
     FOREIGN KEY (hotel_id) REFERENCES hotel(hotel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Payment Table
+-- Create command for Payment Table
 CREATE TABLE payment (
     payment_id INT PRIMARY KEY AUTO_INCREMENT,
     customer_id INT,
@@ -102,7 +102,7 @@ CREATE TABLE payment (
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Review Table
+-- Create command for Review Table
 CREATE TABLE review (
     review_id INT PRIMARY KEY AUTO_INCREMENT,
     customer_id INT,
@@ -114,7 +114,7 @@ CREATE TABLE review (
     FOREIGN KEY (hotel_id) REFERENCES hotel(hotel_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- RoomAvailability Table
+-- Create command for RoomAvailability Table
 CREATE TABLE roomAvailability (
     availability_id INT PRIMARY KEY AUTO_INCREMENT,
     room_id INT,
@@ -127,7 +127,7 @@ CREATE TABLE roomAvailability (
 );
 
 
-
+-- Insert sample values in customer table
 INSERT INTO customer (customer_id, first_name, last_name, email, phone, DOB) VALUES
 (1001, 'Aarav', 'Kumar', 'aarav.kumar@gmail.com', '555-0201', '1985-01-15'),
 (1002, 'Vivaan', 'Mehta', 'vivaan.mehta@gmail.com', '555-0202', '1990-07-19'),
@@ -145,6 +145,7 @@ INSERT INTO customer (customer_id, first_name, last_name, email, phone, DOB) VAL
 (1014, 'Aanya', 'Pillai', 'aanya.pillai@gmail.com', '555-0214', '1993-07-07'),
 (1015, 'Kabir', 'Malhotra', 'kabir.malhotra@gmail.com', '555-0215', '1986-03-15');
 
+-- Insert sample values in hotel table
 INSERT INTO hotel (hotel_id, name, address, rating) VALUES
 (101, 'The Golden Gate Hotel', '100 Bridge Plaza, San Francisco, CA', 5),
 (102, 'The Capitol Suites', '200 Senate Ave, Washington, DC', 4),
@@ -157,6 +158,7 @@ INSERT INTO hotel (hotel_id, name, address, rating) VALUES
 (109, 'The Beacon Hill Bed & Breakfast', '900 Cobblestone Way, Boston, MA', 4),
 (110, 'The Starlight Motel', '1010 Sunset Blvd, Los Angeles, CA', 3);
 
+-- Insert sample values in roomType table
 INSERT INTO roomType (room_type_id, type_name, description) VALUES
 (1, 'Standard', 'A standard room with all the basic amenities.'),
 (2, 'Deluxe', 'A deluxe room with extra space and a comfortable work area.'),
@@ -169,7 +171,7 @@ INSERT INTO roomType (room_type_id, type_name, description) VALUES
 (9, 'Superior', 'A superior room with enhanced room amenities and decor.'),
 (10, 'Penthouse', 'The pinnacle of luxury, offering expansive space and exclusive amenities.');
 
--- Inserting sample data into the `room` table
+-- Insert sample values into the room table
 INSERT INTO room (room_id, room_number, room_type_id, hotel_id, price) VALUES
 (300, 101, 1, 101, 100.00),
 (301, 102, 2, 101, 150.00),
@@ -182,7 +184,7 @@ INSERT INTO room (room_id, room_number, room_type_id, hotel_id, price) VALUES
 (308, 204, 1, 102, 90.00),
 (309, 205, 2, 102, 140.00);
 
-
+-- Insert sample values into activity table
 INSERT INTO activity (activity_id, name, description, price, type) VALUES
 (4001, 'Spa Day', 'A full day of pampering with massages and treatments.', 120.00, 'Wellness'),
 (4002, 'City Tour', 'Guided tour around the city’s historic landmarks.', 60.00, 'Excursion'),
@@ -195,7 +197,7 @@ INSERT INTO activity (activity_id, name, description, price, type) VALUES
 (4009, 'Live Concert', 'Evening entertainment featuring live music.', 40.00, 'Entertainment'),
 (4010, 'Dinner Cruise', 'A romantic evening cruise with dinner on the deck.', 100.00, 'Dining');
 
-
+-- Insert sample values in activityBooking table
 INSERT INTO activityBooking (activity_id, customer_id, date) VALUES
 (4001, 1001, '2023-11-15'),
 (4002, 1002, '2023-11-16'),
@@ -208,7 +210,7 @@ INSERT INTO activityBooking (activity_id, customer_id, date) VALUES
 (4009, 1004, '2023-11-23'),
 (4010, 1005, '2023-11-24');
 
-
+-- Insert sample values in employee table
 INSERT INTO employee (employee_id, name, role, DOB, salary, hotel_id) VALUES
 (5001, 'John Doe', 'Receptionist', '1985-01-10', 28000.00, 101),
 (5002, 'Jane Smith', 'Housekeeper', '1980-02-15', 24000.00, 101),
@@ -222,7 +224,7 @@ INSERT INTO employee (employee_id, name, role, DOB, salary, hotel_id) VALUES
 (5010, 'Linda Thompson', 'Spa Therapist', '1984-10-25', 33000.00, 101);
 
 
-
+-- Insert sample values in payment table
 INSERT INTO payment (amount, type, date) VALUES
 (200.00, 'Credit Card', '2023-01-15'),
 (450.00, 'Debit Card', '2023-01-16'),
@@ -235,6 +237,7 @@ INSERT INTO payment (amount, type, date) VALUES
 (250.00, 'Debit Card', '2023-01-23'),
 (100.00, 'Cash', '2023-01-24');
 
+-- Insert sample values in review table
 INSERT INTO review (review_id, customer_id, hotel_id, rating, comment, source) VALUES
 (1, 1001, 101, 5, 'Outstanding service and beautiful location!', 'Online'),
 (2, 1002, 101, 4, 'Very comfortable rooms and friendly staff.', 'Online'),
@@ -247,7 +250,7 @@ INSERT INTO review (review_id, customer_id, hotel_id, rating, comment, source) V
 (9, 1009, 105, 5, 'Loved the spa and the rooftop pool!', 'Online'),
 (10, 1010, 105, 1, 'Unsatisfactory experience, would not recommend.', 'In-person');
 
-
+-- Insert sample values in roomAvailability table
 INSERT INTO roomAvailability (availability_id, room_id, hotel_id, room_type_id, is_available, date, cleaning_status) VALUES
 (1, 300,101, 1, TRUE, '2023-12-07', 'Cleaned'),
 (2, 301,101,2, TRUE, '2023-12-07', 'Cleaned'),
