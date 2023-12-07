@@ -43,3 +43,6 @@
 - Ensure that the roomAvailability table has the available dates set in future. Example, in order to reserve room with checkin date: 2023-12-08, there must be a roomAvailable for that date in the table pre-inserted. You can add rows to the table using MySQL insert statements.
 - To register your account, you can click register and then login using those credentials. If you directly want to login, you must first insert `(username, password)` manually in MySQL by creating the auth table. The auth table can be created from the `sql/main.sql` file.
 - We encourage you to watch the demo recording before trying out this application. 
+
+## Commands to Run the Application
+- Navigate to the project directory and run the command: `$python3 main.py`

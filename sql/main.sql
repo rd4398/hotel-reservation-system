@@ -291,5 +291,5 @@ INSERT INTO roomAvailability (availability_id, room_id, hotel_id, room_type_id, 
 
 -- Insert into auth
 
-Insert into `auth` (`username`, `password`)
+Insert into `auth` (`username`, `password`) values
 ('rohan.dev', 'rohan@123');
